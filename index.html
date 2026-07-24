@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Grade Calculator</title>
+  <meta name="theme-color" id="meta-theme-color" content="#f6f7fa" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-5 -5 34 34'><rect x='-5' y='-5' width='34' height='34' rx='8' fill='%235766cd'/><g fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M22 10 12 5 2 10l10 5 10-5z'/><path d='M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5'/><path d='M22 10v6'/></g></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    // Stamp the theme before first paint to avoid a light/dark flash.
+    (function () {
+      var t = localStorage.getItem("gradeCalculatorTheme");
+      if (t !== "light" && t !== "dark") {
+        t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- SVG icon set -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-cap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/>
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 5v14M5 12h14"/>
+    </symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 6 6 18M6 6l12 12"/>
+    </symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6M14 11v6"/>
+    </symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+    </symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>
+    </symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 6 9 17l-5-5"/>
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>
+    </symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 6l6 6-6 6"/>
+    </symbol>
+    <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>
+    </symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+    </symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+    </symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+    </symbol>
+    <symbol id="i-scale" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 6h16M4 12h10M4 18h6"/>
+    </symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+    </symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+    </symbol>
+  </svg>
+
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- Switch confirmation toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <svg class="icon"><use href="#i-check"/></svg>
+    <span id="toast-text"></span>
+  </div>
+
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark"><svg class="icon icon-lg"><use href="#i-cap"/></svg></span>
+        <div>
+          <h1>Grade Calculator</h1>
+          <p class="tagline">Flexible grading for every prof — weighted or points, on the 1.00–5.00 scale.</p>
+        </div>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light and dark mode" title="Toggle light / dark mode">
+        <svg class="icon icon-moon"><use href="#i-moon"/></svg>
+        <svg class="icon icon-sun"><use href="#i-sun"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Semester & course pickers -->
+    <section class="card course-bar">
+      <div class="picker-row">
+        <div class="course-select-wrap">
+          <svg class="icon select-icon"><use href="#i-calendar"/></svg>
+          <label for="semester-select" class="visually-hidden">Select semester</label>
+          <select id="semester-select" title="Select semester"></select>
+          <svg class="icon select-chevron"><use href="#i-chevron"/></svg>
+        </div>
+        <div class="course-actions">
+          <button id="btn-add-semester" class="btn" type="button">
+            <svg class="icon"><use href="#i-plus"/></svg><span>New semester</span>
+          </button>
+          <button id="btn-rename-semester" class="btn" type="button">
+            <svg class="icon"><use href="#i-edit"/></svg><span>Rename</span>
+          </button>
+          <button id="btn-delete-semester" class="btn btn-danger" type="button">
+            <svg class="icon"><use href="#i-trash"/></svg><span>Delete</span>
+          </button>
+        </div>
+      </div>
+      <div class="picker-divider" role="presentation"></div>
+      <div class="picker-row">
+        <div class="course-select-wrap">
+          <svg class="icon select-icon"><use href="#i-book"/></svg>
+          <label for="course-select" class="visually-hidden">Select course</label>
+          <select id="course-select" title="Select course"></select>
+          <svg class="icon select-chevron"><use href="#i-chevron"/></svg>
+        </div>
+        <div class="course-actions">
+          <button id="btn-add-course" class="btn btn-primary" type="button">
+            <svg class="icon"><use href="#i-plus"/></svg><span>New course</span>
+          </button>
+          <button id="btn-rename-course" class="btn" type="button">
+            <svg class="icon"><use href="#i-edit"/></svg><span>Rename</span>
+          </button>
+          <button id="btn-delete-course" class="btn btn-danger" type="button">
+            <svg class="icon"><use href="#i-trash"/></svg><span>Delete</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Everything below reflects the active course, and transitions when it changes -->
+    <div id="content-area" class="content-area">
+
+      <!-- Grading mode -->
+      <section class="card">
+        <div class="section-head">
+          <h2><svg class="icon head-icon"><use href="#i-layers"/></svg>Grading system</h2>
+          <div class="mode-toggle" role="tablist" aria-label="Grading mode">
+            <button id="mode-weighted" class="mode-btn" type="button">Weighted categories</button>
+            <button id="mode-points" class="mode-btn" type="button">Total points</button>
+          </div>
+        </div>
+        <p class="hint" id="mode-hint"></p>
+      </section>
+
+      <!-- Weighted categories UI -->
+      <section id="weighted-section" class="hidden">
+        <div id="categories"></div>
+        <div class="add-row">
+          <button id="btn-add-category" class="btn btn-primary" type="button">
+            <svg class="icon"><use href="#i-plus"/></svg><span>Add category</span>
+          </button>
+        </div>
+        <p class="hint status-hint" id="weight-total-hint"></p>
+      </section>
+
+      <!-- Points mode UI -->
+      <section id="points-section" class="card hidden">
+        <div class="section-head">
+          <h2>Assessments</h2>
+        </div>
+        <div class="table-wrap">
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Score</th>
+                <th>Out of</th>
+                <th>%</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="points-items"></tbody>
+          </table>
+        </div>
+        <div class="add-row">
+          <button id="btn-add-point-item" class="btn btn-primary" type="button">
+            <svg class="icon"><use href="#i-plus"/></svg><span>Add assessment</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section class="card results">
+        <h2>Your grade <span class="active-course-label" id="active-course-label"></span></h2>
+        <div class="results-grid">
+          <div class="grade-ring-box">
+            <svg class="grade-ring" viewBox="0 0 120 120" role="img" aria-label="Current grade">
+              <defs>
+                <linearGradient id="ring-gradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" style="stop-color: var(--accent)" />
+                  <stop offset="100%" style="stop-color: var(--accent-2)" />
+                </linearGradient>
+              </defs>
+              <circle class="ring-track" cx="60" cy="60" r="52" />
+              <circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="52" />
+            </svg>
+            <div class="ring-center">
+              <span class="result-value" id="result-percent">—</span>
+              <span class="result-label">Current grade</span>
+            </div>
+          </div>
+          <div class="result-tiles">
+            <div class="result-box">
+              <span class="result-label">Grade equivalent</span>
+              <span class="result-value" id="result-letter">—</span>
+            </div>
+            <div class="result-box">
+              <span class="result-label" id="result-extra-label">Graded weight</span>
+              <span class="result-value result-value-sm" id="result-extra">—</span>
+            </div>
+            <div class="result-box" title="Simple average of your courses' grade equivalents this semester (not unit-weighted)">
+              <span class="result-label">Semester GWA</span>
+              <span class="result-value" id="gwa-value">—</span>
+              <span class="result-sub"><span id="course-count">0</span> courses</span>
+            </div>
+          </div>
+        </div>
+        <p class="hint" id="result-note"></p>
+      </section>
+
+      <!-- Final grade predictor -->
+      <section class="card">
+        <h2><svg class="icon head-icon"><use href="#i-target"/></svg>Final exam predictor</h2>
+        <p class="hint">What do you need on the remaining work to hit your target grade?</p>
+        <div class="predictor-row">
+          <label>Target grade (%)
+            <input type="number" id="target-grade" min="0" max="200" step="0.1" value="90" />
+          </label>
+          <label id="remaining-points-label" class="hidden">Remaining points possible
+            <input type="number" id="remaining-points" min="0" step="0.5" value="100" />
+          </label>
+          <div class="predictor-result">
+            <span class="result-label">You need</span>
+            <span class="result-value" id="predictor-result">—</span>
+          </div>
+        </div>
+        <p class="hint status-hint" id="predictor-note"></p>
+      </section>
+
+      <!-- Grade scale -->
+      <section class="card">
+        <details id="scale-details">
+          <summary>
+            <h2 class="inline-h2"><svg class="icon head-icon"><use href="#i-scale"/></svg>Grade equivalent scale</h2>
+            <span class="hint">click to edit — transmutation tables differ per prof</span>
+            <svg class="icon summary-chevron"><use href="#i-chevron"/></svg>
+          </summary>
+          <div class="table-wrap">
+            <table class="items-table scale-table">
+              <thead>
+                <tr><th>Grade</th><th>Minimum %</th><th></th></tr>
+              </thead>
+              <tbody id="scale-rows"></tbody>
+            </table>
+          </div>
+          <div class="add-row">
+            <button id="btn-add-scale-row" class="btn" type="button">
+              <svg class="icon"><use href="#i-plus"/></svg><span>Add row</span>
+            </button>
+            <button id="btn-reset-scale" class="btn" type="button">Reset to default</button>
+          </div>
+        </details>
+      </section>
+
+    </div>
+
+    <!-- Data management (not course-specific, stays put) -->
+    <section class="card data-bar">
+      <button id="btn-export" class="btn" type="button">
+        <svg class="icon"><use href="#i-download"/></svg><span>Export data</span>
+      </button>
+      <label class="btn file-btn" tabindex="0">
+        <svg class="icon"><use href="#i-upload"/></svg><span>Import data</span>
+        <input type="file" id="import-file" accept=".json" hidden />
+      </label>
+      <button id="btn-clear-all" class="btn btn-danger" type="button">
+        <svg class="icon"><use href="#i-trash"/></svg><span>Clear all data</span>
+      </button>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>Data is saved automatically in your browser (localStorage). Nothing leaves your device.</p>
+  </footer>
+
+  <!-- In-app dialog (replaces native prompt/confirm) -->
+  <dialog id="app-dialog" class="app-dialog">
+    <div class="dialog-body">
+      <h3 id="dialog-title"></h3>
+      <p class="hint" id="dialog-message"></p>
+      <input type="text" id="dialog-input" aria-label="Dialog input" />
+      <div class="dialog-actions">
+        <button id="dialog-cancel" class="btn" type="button">Cancel</button>
+        <button id="dialog-ok" class="btn btn-primary" type="button">OK</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
